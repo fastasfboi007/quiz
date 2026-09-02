@@ -1,0 +1,166 @@
+{
+  "project_title": "Reuters Corporate Intelligence Terminal - Australia Wire",
+  "archetype": "Financial Newsroom Meets Modern Game Show",
+  "theme": {
+    "default_mode": "dark",
+    "toggle_supported": true,
+    "dark_tokens": {
+      "background_canvas": "#0B0E14",
+      "surface_card": "#131822",
+      "surface_elevated": "#1C2333",
+      "border_hairline": "rgba(255, 255, 255, 0.08)",
+      "border_interactive": "rgba(255, 255, 255, 0.18)",
+      "text_primary": "#F1F5F9",
+      "text_secondary": "#94A3B8",
+      "text_muted": "#64748B",
+      "gold_accent": "#F59E0B",
+      "ticker_border": "#2A3447"
+    },
+    "light_tokens": {
+      "background_canvas": "#F8FAFC",
+      "surface_card": "#FFFFFF",
+      "surface_elevated": "#F1F5F9",
+      "border_hairline": "#E2E8F0",
+      "border_interactive": "#CBD5E1",
+      "text_primary": "#0F172A",
+      "text_secondary": "#475569",
+      "text_muted": "#64748B",
+      "gold_accent": "#D97706",
+      "ticker_border": "#E2E8F0"
+    }
+  },
+  "company_branding": {
+    "ANZ": {
+      "name": "ANZ Banking Group",
+      "ticker": "ASX: ANZ",
+      "accent_color": "#0072CE",
+      "accent_light": "#38BDF8",
+      "bg_badge_dark": "rgba(0, 114, 206, 0.15)",
+      "border_badge_dark": "rgba(0, 114, 206, 0.4)"
+    },
+    "Star": {
+      "name": "The Star Entertainment Group",
+      "ticker": "ASX: SGR",
+      "accent_color": "#F59E0B",
+      "accent_light": "#FBBF24",
+      "bg_badge_dark": "rgba(245, 158, 11, 0.15)",
+      "border_badge_dark": "rgba(245, 158, 11, 0.4)"
+    },
+    "Santos": {
+      "name": "Santos Energy",
+      "ticker": "ASX: STO",
+      "accent_color": "#F97316",
+      "accent_light": "#FB923C",
+      "bg_badge_dark": "rgba(249, 115, 22, 0.15)",
+      "border_badge_dark": "rgba(249, 115, 22, 0.4)"
+    },
+    "RioTinto": {
+      "name": "Rio Tinto Mining",
+      "ticker": "ASX: RIO",
+      "accent_color": "#EF4444",
+      "accent_light": "#F87171",
+      "bg_badge_dark": "rgba(239, 68, 68, 0.15)",
+      "border_badge_dark": "rgba(239, 68, 68, 0.4)"
+    },
+    "WiseTech": {
+      "name": "WiseTech Global",
+      "ticker": "ASX: WTC",
+      "accent_color": "#06B6D4",
+      "accent_light": "#22D3EE",
+      "bg_badge_dark": "rgba(6, 182, 212, 0.15)",
+      "border_badge_dark": "rgba(6, 182, 212, 0.4)"
+    }
+  },
+  "typography": {
+    "headline_font": "Playfair Display, Merriweather, Georgia, serif",
+    "body_font": "Plus Jakarta Sans, Inter, sans-serif",
+    "mono_font": "JetBrains Mono, IBM Plex Mono, monospace",
+    "hierarchy": {
+      "ticker_header": "font-mono text-xs uppercase tracking-[0.25em] text-amber-500 font-bold",
+      "hero_title": "font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight",
+      "question_title": "font-sans text-base sm:text-lg font-semibold leading-snug",
+      "option_text": "font-sans text-sm font-medium",
+      "metric_value": "font-mono text-2xl sm:text-3xl font-bold tracking-tight"
+    }
+  },
+  "layouts": {
+    "sticky_dashboard": {
+      "description": "Top sticky live wire ticker broadcast bar with Reuters branding, total live score counter (e.g. 28/40), real-time stopwatch timer, high-precision progress percentage gauge, theme switcher, leaderboard drawer trigger, and AI question regenerator button.",
+      "padding": "px-4 py-3 sm:px-8",
+      "blur": "backdrop-blur-xl bg-slate-950/80 dark:bg-slate-950/85 light:bg-white/90 border-b border-slate-800"
+    },
+    "grid_structure": {
+      "type": "Responsive Multi-Column Bento / Cards Grid",
+      "cols": "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6",
+      "filtering": "Company tabs bar (ALL, ANZ, Star, Santos, Rio Tinto, WiseTech) + Category/Difficulty tags + Search filter input + Answer status filter (All, Answered, Unanswered, Incorrect, Correct)"
+    },
+    "question_card": {
+      "border_radius": "rounded-xl",
+      "base_style": "p-5 border flex flex-col justify-between transition-all duration-200 relative overflow-hidden shadow-sm hover:shadow-md",
+      "dark_card": "bg-[#131822] border-slate-800 hover:border-slate-700",
+      "feedback_states": {
+        "unanswered": "border-slate-800 hover:border-slate-700",
+        "correct": "bg-emerald-950/30 border-emerald-500/80 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.15)]",
+        "incorrect": "bg-rose-950/30 border-rose-500/80 text-rose-100 shadow-[0_0_15px_rgba(244,63,94,0.15)]",
+        "correct_revealed": "bg-emerald-950/40 border-emerald-400 text-emerald-200 ring-2 ring-emerald-500/50"
+      }
+    }
+  },
+  "motion_and_interactions": {
+    "card_hover": "hover:-translate-y-0.5 transition-transform duration-200 ease-out",
+    "option_select_feedback": "Instant visual transition: option card flashes emerald or crimson with sub-second spring scale transition",
+    "submit_action": "Locks all radio/option inputs, triggers performance analysis calculate animation, opens full screen breakdown modal with score accolades",
+    "modal_transitions": "Framer motion scale-in with background glass blur backdrop"
+  },
+  "image_urls": [
+    {
+      "category": "hero_background",
+      "url": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHwxfHxzdG9jayUyMG1hcmtldCUyMHRyYWRpbmclMjB0ZXJtaW5hbCUyMGZpbmFuY2V8ZW58MHx8fHwxNzg4MzQ2MTQxfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Stock market trading terminal dark screen"
+    },
+    {
+      "category": "sydney_financial_district",
+      "url": "https://images.unsplash.com/photo-1561488111-5d800fd56b8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxzeWRuZXklMjBza3lsaW5lJTIwY29ycG9yYXRlJTIwc2t5c2NyYXBlcnN8ZW58MHx8fHwxNzg4MzQ2MTMyfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Sydney corporate skyscrapers skyline background"
+    }
+  ],
+  "testing_attributes": {
+    "required_data_testids": [
+      "app-header-ticker",
+      "total-score-display",
+      "stopwatch-timer",
+      "progress-bar",
+      "company-filter-all",
+      "company-filter-anz",
+      "company-filter-star",
+      "company-filter-santos",
+      "company-filter-riotinto",
+      "company-filter-wisetech",
+      "search-input",
+      "status-filter-select",
+      "question-card-{id}",
+      "question-company-badge-{id}",
+      "option-card-{questionId}-{optionIdx}",
+      "submit-quiz-button",
+      "reset-quiz-button",
+      "ai-regenerate-button",
+      "leaderboard-button",
+      "theme-toggle-button",
+      "performance-summary-modal",
+      "summary-accuracy-percent",
+      "company-breakdown-{companyId}",
+      "leaderboard-modal",
+      "leaderboard-item-{rank}"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Implement a complete full-stack dynamic solution: React JS frontend and FastAPI backend.",
+    "Ensure all 40 questions are fully structured across the 5 target companies (ANZ, The Star, Santos, Rio Tinto, WiseTech Global) with realistic, high-stakes financial intelligence scenarios (compliance, mergers, balance sheet figures, board movements, ESG risks, regulatory investigations).",
+    "Provide instant green/red option feedback when answering each question, with explanations for why an answer is correct.",
+    "Maintain live score (e.g., 28/40), stopwatch timer, and animated progress bar on the sticky header.",
+    "Include a dynamic AI question generator endpoint `/api/regenerate-questions` in FastAPI that generates fresh dynamic MCQs using predefined financial templates/LLM, updating the quiz grid.",
+    "Store quiz attempts and leaderboard entries in backend database/JSON file, accessible via `/api/leaderboard` GET and POST endpoints.",
+    "Ensure strict adherence to all `data-testid` requirements for robust automated test coverage.",
+    "Implement light/dark mode seamlessly using class-based or attribute-based Tailwind theme toggle."
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "summary": "Full backend + frontend E2E test of the Australia Wire quiz app. Backend: 8 pytest cases (questions shape/shuffle/correct-answer integrity, leaderboard CRUD+sort+validation, AI regenerate) — 7/8 passed. Frontend: load/dark-mode/dashboard, instant feedback + per-question lock, live score & progress, all 5 company filters, search, 4 status filters, both submit buttons, summary modal + per-company breakdown, save-to-leaderboard, leaderboard modal, theme toggle, reset — all passed. Single blocking defect: POST /api/regenerate-questions takes ~70s and is killed by the ingress gateway with 502, so the AI Regenerate button always fails for users.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "POST /api/regenerate-questions", "issue": "Works on localhost:8001 (200, ~70s, 41 questions) but always returns 502 Bad gateway through the public ingress (edge timeout ~60s). UI 'AI Regenerate' therefore always shows 'AI generation failed'. Fix: split into 5 concurrent per-company LLM calls (8 Qs each) via asyncio.gather so total latency drops under ~30s, or move to a background job + polling.", "priority": "CRITICAL"}
+    ],
+    "minor": [
+      {"endpoint": "POST /api/regenerate-questions", "issue": "LLM returned 41 questions (WiseTech 9) — no per-company cap/trim to exactly 8x5=40, so counts can be unbalanced. Add per-company slicing to 8."},
+      {"endpoint": "GET /api/leaderboard", "issue": "Response exposes Mongo document key as `_id` alias (string uuid, not ObjectId, so no serialization error) — consider returning `id` for consistency with the rest of the API."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "AI question regeneration", "issue": "Click on AI Regenerate -> 502 after ~60s -> error toast 'AI generation failed — try again'. Error handling is graceful but the feature is unusable through the public URL.", "affected_selectors": ["[data-testid=\"ai-regenerate-button\"]"]}
+    ],
+    "design_issues": [
+      {"screen": "Question grid", "issues": ["Option lists are bottom-aligned within equal-height cards, leaving a large empty gap between the question text and options on shorter questions (see 3-line vs 1-line question cards in the same row)."]},
+      {"screen": "Sticky dashboard", "issues": ["progress-bar element has no aria-valuenow/role=progressbar attributes (minor a11y/testability gap; visual percentage text is correct)."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "CRITICAL: Make /api/regenerate-questions finish in <55s (parallel per-company LLM calls with asyncio.gather) so the ingress does not 502; re-verify via public URL.",
+    "Trim/normalize AI output to exactly 8 questions per company (40 total).",
+    "Optional: include option text in the search filter (search currently matches question+category only, so 'Judo Bank' returns 0 results).",
+    "Optional: add role=progressbar/aria-valuenow to the dashboard progress bar."
+  ],
+  "critical_code_review_comments": [
+    "server.py regenerate endpoint is a single long blocking LLM request with no timeout budget awareness — it exceeds the platform gateway timeout; parallelize per company and add a per-call timeout with partial-result fallback.",
+    "No cap on questions per company after AI validation loop (len(result) only checked >= 20), allowing unbalanced sets like 9 WiseTech / 8 others."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "87.5% (7/8 pytest cases)", "frontend": "95% (all flows pass except AI regenerate which is blocked by the backend timeout)"},
+  "seed_data_creation": "Created and deleted TEST_* leaderboard attempts (TEST_qa_user, TEST_sort_*, TEST_ui_reporter). Pre-existing 'Test Reporter 32/40' entry from the main agent was left untouched.",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Company filter/summary breakdown testids are LOWERCASE (company-filter-anz|star|santos|riotinto|wisetech, company-breakdown-anz, ...), summary close is summary-close-button, leaderboard close is leaderboard-close-button. Backend regression suite lives at /app/backend/tests/backend_test.py (run with pytest from /app/backend; pytest.ini forces -n 2 --dist loadscope). Only remaining open item after a fix is verifying POST /api/regenerate-questions returns 200 within the ingress timeout through the public URL and that the UI shows the success toast + fresh 40-question grid.",
+  "rca_of_the_issue": "The regenerate endpoint asks claude-sonnet-4-6 for 40 questions in one response. Measured local latency: 69.9s (200 OK, 41 questions). The Emergent preview ingress/Cloudflare edge terminates requests around 60s, returning an HTML 502 page, so both pytest and the browser see 502 while backend logs show a successful LiteLLM completion. Mitigation: fan out 5 smaller LLM calls concurrently."
+}

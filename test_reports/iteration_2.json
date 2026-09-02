@@ -1,0 +1,35 @@
+{
+  "summary": "Retest of the CRITICAL regenerate-questions fix plus light regression. Backend: 8/8 pytest cases pass (/app/backend/tests/backend_test.py, updated to assert exactly 40 balanced questions + <55s latency budget). POST /api/regenerate-questions via the PUBLIC URL now returns 200 with exactly 40 questions (8 per company, unique ids, 4 options each, valid correctIndex) — full pytest session (incl. regenerate) finished in 21s, so the previous ~70s / 502 ingress blocker is resolved. Frontend: AI Regenerate button returns HTTP 200, shows success toast 'AI generated a fresh 40-question set', and the grid refreshes to a completely new 40-question set (no 502). Regression all green: 40 cards render, instant feedback + per-question lock, live score increment (1/40), ANZ company filter shows 8, submit opens summary modal with accuracy 3% and all 5 per-company breakdowns (0/8..1/8), save-to-leaderboard persists (verified via GET /api/leaderboard and the leaderboard modal), post-submit inputs locked, theme toggle works (html class '' -> 'light'), reset zeroes score and reshuffles the deck. Zero console errors, zero error-class elements, no backend errors in supervisor logs.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/leaderboard", "issue": "Still exposes the Mongo document key as `_id` alias (string uuid, no serialization error) instead of `id` — inconsistent with the rest of the API. Carried over from iteration 1, non-blocking."},
+      {"endpoint": "POST /api/regenerate-questions", "issue": "Balanced 40 achieved via out[:8] trim, but there is no floor per company: if one of the 5 LLM calls fails or under-produces, the endpoint can still return e.g. 32 questions with 200 (only a global >=20 guard). Consider asserting 8 per company or backfilling from the static set."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Question grid", "issues": ["Carried over from iteration 1: options are bottom-aligned in equal-height cards, so short 1-line questions show a large blank gap between question text and the first option (visible in the same row as 3-line questions)."]},
+      {"screen": "Sticky dashboard", "issues": ["progress-bar has no role=progressbar / aria-valuenow (minor a11y, carried over)."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "None blocking. Optional: return `id` instead of `_id` from the leaderboard endpoints.",
+    "Optional: guarantee a per-company floor of 8 in regenerate (backfill from static QUESTIONS if an LLM call fails) so a partial fan-out never yields <40.",
+    "Optional polish: top-align option lists in question cards; add role=progressbar/aria-valuenow to the dashboard progress bar."
+  ],
+  "critical_code_review_comments": [
+    "regenerate_questions(): asyncio.gather has no return_exceptions and no per-call timeout; a single hung LLM call will block the whole request until the client/ingress gives up. Add asyncio.wait_for per company with a partial-result fallback.",
+    "regenerate_questions() is a ~90-line inline closure block inside one route handler (prompts, briefs, parser, generator). Extract prompts/parse_questions into a separate module for testability."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (8/8 pytest cases)", "frontend": "100% (regenerate + all regression flows passed)"},
+  "seed_data_creation": "Created and deleted TEST_* leaderboard attempts (TEST_qa_user, TEST_sort_*, TEST_ui_regen). Pre-existing 'Test Reporter 32/40' entry left untouched.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Regenerate blocker from iteration_1 is FIXED and verified end-to-end through the public URL (backend 200 in ~20s with 40 balanced questions; UI success toast + refreshed grid). Regression suite: /app/backend/tests/backend_test.py (run `pytest tests/backend_test.py` from /app/backend; pytest.ini forces -n 2 --dist loadscope). Testids: company-filter-{all|anz|star|santos|riotinto|wisetech}, company-breakdown-{anz|...}, total-score-display, option-card-{questionId}-{index}, summary/leaderboard close buttons. NOTE for UI tests: LeaderboardModal fetches on open, so wait ~2-3s after the modal appears before asserting entry text or you will read the loading state (false negative).",
+  "rca_of_the_issue": "Iteration-1 RCA (single 40-question LLM call, ~70s, killed at the ~60s ingress edge with 502) is resolved: regenerate_questions() now fans out 5 concurrent per-company LLM calls via asyncio.gather with parse_questions() capping each to 8, dropping total latency to ~20s — comfortably inside the ingress budget. Verified both by pytest against the public URL and by clicking data-testid=ai-regenerate-button in the browser."
+}
